@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery App - FoodHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF8C42;
+            --secondary: #008B7E;
+            --dark: #1A1A1A;
+            --light: #F5F5F5;
+            --gray: #999999;
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 2px solid #e0e0e0;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .nav-btn:hover {
+            background: #FFF8F5;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Main Container */
+        .main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 40px;
+            border: 8px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .screen.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Splash Screen */
+        .splash {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+        }
+
+        .splash-logo {
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 50px;
+        }
+
+        /* Common Styles */
+        .container {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .skip-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            padding: 16px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #FF7B30 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .login-link {
+            text-align: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: block;
+            margin-top: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            background: #f9f9f9;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.1);
+        }
+
+        .carousel-container {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #FFA726 0%, #FFB74D 100%);
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 60px;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: var(--secondary);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* Home Screen Specific */
+        .home-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-bottom: 1px solid #f0f0f0;
+            margin: -24px -24px 24px -24px;
+        }
+
+        .delivery-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 12px;
+        }
+
+        .delivery-info .label {
+            color: #999;
+            text-decoration: underline;
+        }
+
+        .delivery-info .address {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 13px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF7B30 100%);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .restaurant-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .restaurant-img {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #FFA726 0%, #FFB74D 100%);
+        }
+
+        .restaurant-info {
+            padding: 12px;
+        }
+
+        .restaurant-info h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .restaurant-info p {
+            font-size: 12px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+            margin-top: auto;
+        }
+
+        .nav-icon {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 12px;
+        }
+
+        .search-btn {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF7B30 100%);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -8px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Form Styles */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-row .input-group {
+            margin-bottom: 0;
+        }
+
+        /* Product & Cart Styles */
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #FFA726 0%, #FFB74D 100%);
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+        }
+
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            width: fit-content;
+            padding: 8px 16px;
+            border-radius: 50px;
+            gap: 16px;
+            margin-bottom: 24px;
+            color: white;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .qty-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            border: 3px solid var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 40px auto;
+            font-size: 60px;
+            color: var(--secondary);
+        }
+
+        .center-text {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h2>🍕 Navigation</h2>
+        <button class="nav-btn active" data-screen="splash">1. Splash</button>
+        <button class="nav-btn" data-screen="onboarding-1">2. Onboarding 1</button>
+        <button class="nav-btn" data-screen="onboarding-2">3. Onboarding 2</button>
+        <button class="nav-btn" data-screen="onboarding-3">4. Onboarding 3</button>
+        <button class="nav-btn" data-screen="signup">5. Sign Up</button>
+        <button class="nav-btn" data-screen="login">6. Login</button>
+        <button class="nav-btn" data-screen="forgot-password">7. Forgot Password</button>
+        <button class="nav-btn" data-screen="reset-password">8. Reset Password</button>
+        <button class="nav-btn" data-screen="home">9. Home</button>
+        <button class="nav-btn" data-screen="product-details">10. Product Details</button>
+        <button class="nav-btn" data-screen="cart">11. Cart</button>
+        <button class="nav-btn" data-screen="payment">12. Payment</button>
+        <button class="nav-btn" data-screen="orders">13. Orders</button>
+        <button class="nav-btn" data-screen="settings">14. Settings</button>
+        <button class="nav-btn" data-screen="success">15. Success</button>
+    </div>
+
+    <!-- Main Screen Area -->
+    <div class="main">
+        <!-- Screen 1: Splash -->
+        <div id="splash" class="screen splash active">
+            <div class="splash-logo">✓</div>
+        </div>
+
+        <!-- Screen 2: Onboarding 1 -->
+        <div id="onboarding-1" class="screen">
+            <div class="container">
+                <div class="header">
+                    <div class="logo"></div>
+                    <button class="skip-btn">Skip</button>
+                </div>
+                <h1 class="title">Order from your favourite stores or vendors</h1>
+                <div class="carousel-container">📱</div>
+                <div class="dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <button class="btn btn-primary">Create an account</button>
+                <a href="#" class="login-link">login</a>
+            </div>
+        </div>
+
+        <!-- Screen 3: Onboarding 2 -->
+        <div id="onboarding-2" class="screen">
+            <div class="container">
+                <div class="header">
+                    <div class="logo"></div>
+                    <button class="skip-btn">Skip</button>
+                </div>
+                <h1 class="title">Choose from a wide range of delicious meals</h1>
+                <div class="carousel-container">🍔</div>
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                </div>
+                <button class="btn btn-primary">Create an account</button>
+                <a href="#" class="login-link">login</a>
+            </div>
+        </div>
+
+        <!-- Screen 4: Onboarding 3 -->
+        <div id="onboarding-3" class="screen">
+            <div class="container">
+                <div class="header">
+                    <div class="logo"></div>
+                    <button class="skip-btn">Skip</button>
+                </div>
+                <h1 class="title">Enjoy instant delivery and payment</h1>
+                <div class="carousel-container">🚚</div>
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot active"></div>
+                </div>
+                <button class="btn btn-primary">Create an account</button>
+                <a href="#" class="login-link">login</a>
+            </div>
+        </div>
+
+        <!-- Screen 5: Sign Up -->
+        <div id="signup" class="screen">
+            <div class="container">
+                <div class="header">
+                    <div class="logo"></div>
+                </div>
+                <h1 class="title">Create an account</h1>
+                <p class="subtitle">Welcome friend, enter your details so lets get started in ordering food.</p>
+                
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="Enter email">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="Enter password">
+                </div>
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" placeholder="Confirm Password">
+                </div>
+                
+                <button class="btn btn-primary">Create an account</button>
+                <p style="text-align: center; font-size: 14px; color: #666;">📱 Sign-in with Google</p>
+                <a href="#" class="login-link">Login to my account</a>
+            </div>
+        </div>
+
+        <!-- Screen 6: Login -->
+        <div id="login" class="screen">
+            <div class="container">
+                <div class="header">
+                    <div class="logo"></div>
+                    <button class="skip-btn">Skip</button>
+                </div>
+                <h1 class="title">Login to your account</h1>
+                <p class="subtitle">Good to see you again, enter your details below to continue ordering.</p>
+                
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="Enter email">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="Enter password">
+                </div>
+                
+                <button class="btn btn-primary">Login to my account</button>
+                <p style="text-align: center; font-size: 14px; color: #666;">📱 Sign-in with Google</p>
+            </div>
+        </div>
+
+        <!-- Screen 7: Forgot Password -->
+        <div id="forgot-password" class="screen">
+            <div class="container">
+                <div class="header">
+                    <div class="logo"></div>
+                    <button class="skip-btn">Cancel</button>
+                </div>
+                <h1 class="title">Forgot password</h1>
+                <p class="subtitle">Enter your email address to request a password reset.</p>
+                
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="Enter email address">
+                </div>
+                
+                <button class="btn btn-primary">Create an account</button>
+                <p style="text-align: center; font-size: 14px; color: #666;">📱 Sign-in with Google</p>
+                <a href="#" class="login-link">Login to my account</a>
+            </div>
+        </div>
+
+        <!-- Screen 8: Reset Password -->
+        <div id="reset-password" class="screen">
+            <div class="container">
+                <div class="header">
+                    <div class="logo"></div>
+                    <button class="skip-btn">Cancel</button>
+                </div>
+                <h1 class="title">Reset Password</h1>
+                <p class="subtitle">A reset code has been sent to your email</p>
+                
+                <div class="input-group">
+                    <label>Enter code</label>
+                    <input type="text" placeholder="Enter 4-digit code">
+                </div>
+                
+                <button class="btn btn-primary">Reset Password</button>
+            </div>
+        </div>
+
+        <!-- Screen 9: Home -->
+        <div id="home" class="screen">
+            <div class="home-header">
+                <button class="menu-btn">☰</button>
+                <div class="delivery-info">
+                    <div class="label">Delivery to</div>
+                    <div class="address">lekki phase 1, Estate</div>
+                </div>
+                <div class="avatar"></div>
+            </div>
+            <div class="container">
+                <h1 class="title">Enjoy Delicious food</h1>
+                
+                <div class="section-title">Popular restaurants</div>
+                <div class="restaurant-grid">
+                    <div class="restaurant-card">
+                        <div class="restaurant-img"></div>
+                        <div class="restaurant-info">
+                            <h3>Big cheese burger</h3>
+                            <p>No 10 opp lekki phase</p>
+                        </div>
+                    </div>
+                    <div class="restaurant-card">
+                        <div class="restaurant-img"></div>
+                        <div class="restaurant-info">
+                            <h3>Medium cheese</h3>
+                            <p>No 10 opp lekki phase</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bottom-nav">
+                    <button class="nav-icon">🏠</button>
+                    <button class="nav-icon">❤️</button>
+                    <button class="search-btn">🔍</button>
+                    <button class="nav-icon">🔔</button>
+                    <button class="nav-icon">🛒</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 10: Product Details -->
+        <div id="product-details" class="screen">
+            <div class="container">
+                <button class="menu-btn">←</button>
+                <div class="product-image"></div>
+                
+                <div class="qty-selector">
+                    <button class="qty-btn">−</button>
+                    <span>2</span>
+                    <button class="qty-btn">+</button>
+                </div>
+                
+                <h1 class="title">Big boys Cheese burger</h1>
+                <div class="meta">
+                    <span>⭐ 4+</span>
+                    <span>🔥 300kcal</span>
+                    <span>⏱️ 5-10min</span>
+                </div>
+                
+                <p class="desc">Our simple, classic cheeseburger begins with a 100% pure beef burger seasoned with just a pinch of salt and pepper...</p>
+                
+                <button class="btn btn-primary">Process to payment</button>
+            </div>
+        </div>
+
+        <!-- Screen 11: Cart -->
+        <div id="cart" class="screen">
+            <div class="container">
+                <button class="menu-btn">←</button>
+                <h1 class="title">Your cart</h1>
+                
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                    <p><strong>The Macdonalds</strong></p>
+                    <p style="font-size: 12px; color: #999;">Classic cheeseburger</p>
+                    <p style="color: var(--primary); font-weight: 700;">$23.99</p>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                    <p><strong>The Macdonalds</strong></p>
+                    <p style="font-size: 12px; color: #999;">Classic cheeseburger</p>
+                    <p style="color: var(--primary); font-weight: 700;">$23.99</p>
+                </div>
+                
+                <div style="padding-top: 16px; border-top: 1px solid #e0e0e0; margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
+                        <span>Total</span>
+                        <span>$345</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">Process to payment</button>
+            </div>
+        </div>
+
+        <!-- Screen 12: Payment -->
+        <div id="payment" class="screen">
+            <div class="container">
+                <button class="menu-btn">←</button>
+                <h1 class="title">Payment</h1>
+                
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Delivery method</h3>
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                    <p>137 Teatieket Hwy, East Falmouth MA 2536</p>
+                </div>
+                
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Card details</h3>
+                <div class="input-group">
+                    <input type="text" placeholder="Enter card details">
+                </div>
+                
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Exp date</label>
+                        <input type="text" placeholder="DD/MM">
+                    </div>
+                    <div class="input-group">
+                        <label>CVV</label>
+                        <input type="text" placeholder="CVV">
+                    </div>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Delivery Fee</span>
+                        <span>$20</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Subtotal</span>
+                        <span>$520</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; padding-top: 8px; border-top: 1px solid #e0e0e0;">
+                        <span>Total</span>
+                        <span>$540</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">Pay now</button>
+            </div>
+        </div>
+
+        <!-- Screen 13: Orders -->
+        <div id="orders" class="screen">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h1 class="title" style="margin: 0;">Your orders</h1>
+                    <button class="menu-btn">✕</button>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid var(--secondary);">
+                    <span style="font-size: 11px; font-weight: 600; color: var(--secondary);">✓ Completed</span>
+                    <p><strong>The Macdonalds</strong></p>
+                    <p style="font-size: 12px; color: #999;">Classic cheeseburger</p>
+                    <p style="color: var(--primary); font-weight: 700;">$23.99</p>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid var(--secondary);">
+                    <span style="font-size: 11px; font-weight: 600; color: var(--secondary);">✓ Completed</span>
+                    <p><strong>The Macdonalds</strong></p>
+                    <p style="font-size: 12px; color: #999;">Classic cheeseburger</p>
+                    <p style="color: var(--primary); font-weight: 700;">$23.99</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 14: Settings -->
+        <div id="settings" class="screen">
+            <div class="container">
+                <button class="menu-btn">←</button>
+                <h1 class="title">Settings</h1>
+                
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Delivery method</h3>
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                    <p>137 Teatieket Hwy</p>
+                    <p>+234 9011039271</p>
+                </div>
+                
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Payment</h3>
+                <p style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">💳 Pay on arrival</p>
+                <p style="font-size: 12px; color: var(--primary);">Pay with cash/POS upon arrival</p>
+            </div>
+        </div>
+
+        <!-- Screen 15: Success -->
+        <div id="success" class="screen">
+            <div class="container center-text">
+                <button class="menu-btn">←</button>
+                <div class="success-icon">✓</div>
+                <h1 class="title">Your order has been<br>successfully placed</h1>
+                <p class="subtitle">Sit and relax while your orders is being worked on. It'll take 5min before you get it</p>
+                <button class="btn btn-primary">Go back to home</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Navigation
+        const screens = document.querySelectorAll('.screen');
+        const navBtns = document.querySelectorAll('.nav-btn');
+
+        function showScreen(id) {
+            screens.forEach(s => s.classList.remove('active'));
+            const screen = document.getElementById(id);
+            if (screen) {
+                screen.classList.add('active');
+            }
+            
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            const btn = document.querySelector(`[data-screen="${id}"]`);
+            if (btn) {
+                btn.classList.add('active');
+            }
+        }
+
+        // Navigate on button click
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const screenId = btn.dataset.screen;
+                showScreen(screenId);
+            });
+        });
+
+        // Skip button actions
+        document.querySelectorAll('.skip-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showScreen('signup');
+            });
+        });
+
+        // Primary button actions
+        document.querySelectorAll('.btn-primary').forEach((btn, idx) => {
+            btn.addEventListener('click', (e) => {
+                if (e.target.textContent.includes('Create an account')) {
+                    showScreen('home');
+                } else if (e.target.textContent.includes('Login')) {
+                    showScreen('home');
+                } else if (e.target.textContent.includes('Process to payment')) {
+                    showScreen('payment');
+                } else if (e.target.textContent.includes('Pay now')) {
+                    showScreen('success');
+                } else if (e.target.textContent.includes('Reset')) {
+                    showScreen('home');
+                } else if (e.target.textContent.includes('Go back')) {
+                    showScreen('home');
+                }
+            });
+        });
+
+        // Back button
+        document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.textContent === '←') {
+                    showScreen('home');
+                } else if (btn.textContent === '☰') {
+                    showScreen('orders');
+                } else if (btn.textContent === '✕') {
+                    showScreen('home');
+                }
+            });
+        });
+
+        // Login links
+        document.querySelectorAll('.login-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                showScreen('login');
+            });
+        });
+
+        // Bottom nav
+        document.querySelectorAll('.search-btn').forEach(btn => {
+            btn.addEventListener('click', () => showScreen('home'));
+        });
+
+        console.log('✅ App loaded! Click any button on the left to navigate.');
+    </script>
+</body>
+</html>
